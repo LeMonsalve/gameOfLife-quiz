@@ -1,62 +1,153 @@
 package parser;
 
+import data.ArgumentErrorTypes;
 import data.ArgumentRequirements;
+import data.ArgumentValidations;
+import logger.Logger;
+
+import java.util.Arrays;
 
 public class Parser {
+    private final Logger logger;
 
-    public void parse(String[] args) {
-        int width = parseWidth(args);
+    public Parser(String[] args, Logger logger) {
+        ArgumentRequirements.getInstance().setArguments(args);
+        this.logger = logger;
+    }
+
+    public void parse() {
+        int width = parseWidth();
         ArgumentRequirements.getInstance().setWidth(width);
 
-        int height = parseHeight(args);
+        int height = parseHeight();
         ArgumentRequirements.getInstance().setHeight(height);
 
-        int generations = parseGenerations(args);
+        int generations = parseGenerations();
         ArgumentRequirements.getInstance().setGenerations(generations);
 
-        int speed = parseSpeed(args);
+        int speed = parseSpeed();
         ArgumentRequirements.getInstance().setSpeed(speed);
 
-        String population = parsePopulation(args);
+        String population = parsePopulation();
         ArgumentRequirements.getInstance().setPopulation(population);
     }
 
-    private int parseWidth(String[] args) {
-        int width = parseIntArg(args, "w");
+    private int parseWidth() {
+        int width = parseIntArg("w");
+
+        int[] validWidths = ArgumentValidations.getInstance().getValidWidths();
+
+        boolean isValid = isValidInt(width, validWidths);
+
+        if (!isValid) width = ArgumentErrorTypes.NO_VALID;
+
         return width;
     }
 
-    private int parseHeight(String[] args) {
-        int height = parseIntArg(args, "h");
+    private int parseHeight() {
+        int height = parseIntArg("h");
+
+        int[] validHeights = ArgumentValidations.getInstance().getValidHeights();
+        boolean isValid = isValidInt(height, validHeights);
+
+        if (!isValid) height = ArgumentErrorTypes.NO_VALID;
+
         return height;
     }
 
-    private int parseGenerations(String[] args) {
-        int generations = parseIntArg(args, "g");
+    private int parseGenerations() {
+        int generations = parseIntArg("g");
         return generations;
     }
 
-    private int parseSpeed(String[] args) {
-        int speed = parseIntArg(args, "s");
+    private int parseSpeed() {
+        int speed = parseIntArg("s");
         return speed;
     }
 
-    private String parsePopulation(String[] args) {
-        return "population";
-    }
+    private String parsePopulation() {
+        int width = ArgumentRequirements.getInstance().getWidth();
+        int height = ArgumentRequirements.getInstance().getHeight();
 
-    private String parseArg(String[] args, String arg) {
-        return "";
-    }
+        String population = findArgByLetter("p");
 
-    private int parseIntArg(String[] args, String arg) {
-        String value = parseArg(args, arg);
+        String populationValue = population.split("=")[1];
 
-        if (value.isEmpty()) {
-            return -1;
+        if (width == -1 || width == -2) {
+            logger.error("Population is invalid because width is invalid or not present");
+            population = String.valueOf(ArgumentErrorTypes.NO_VALID);
+            return population;
         }
 
-        return Integer.parseInt(value.substring(2));
+        if (height == -1 || height == -2) {
+            logger.error("Population is invalid because height is invalid or not present");
+            population = String.valueOf(ArgumentErrorTypes.NO_VALID);
+            return population;
+        }
+
+        if (populationValue.startsWith("#")) {
+            population = String.valueOf(ArgumentErrorTypes.NO_VALID);
+            return population;
+        }
+
+        String[] populationLines = populationValue.split("#");
+        int firstRowLength = populationLines[0].length();
+
+        for (String line : populationLines) {
+            if (line.length() != firstRowLength) {
+                population = String.valueOf(ArgumentErrorTypes.NO_VALID);
+                return population;
+            }
+        }
+
+        int populationRows = populationValue.split("#").length;
+        int populationCols = populationValue.split("#")[0].length();
+
+        if (populationRows != height || populationCols != width) {
+            population = String.valueOf(ArgumentErrorTypes.NO_VALID);
+            return population;
+        }
+
+        population = populationValue;
+
+        return population;
+    }
+
+    private String findArgByLetter(String argumentLetter) {
+        String value = "";
+
+        for (String arg : getArguments()) {
+            if (arg.startsWith(argumentLetter)) {
+                value = arg;
+            }
+        }
+
+        return value;
+    }
+
+    private int parseIntArg(String argumentLetter) {
+        String argValue = findArgByLetter(argumentLetter);
+
+        int number = ArgumentErrorTypes.NO_VALID;
+
+        if (!argValue.isEmpty()) {
+            String value = argValue.split("=")[1];
+
+            try {
+                number = Integer.parseInt(value);
+            } catch (NumberFormatException ignored) {}
+        }
+
+        return number;
+    }
+
+    private boolean isValidInt(int value, int[] validValues) {
+        boolean isValid = Arrays.stream(validValues).anyMatch(validValue -> value == validValue);
+        return isValid;
+    }
+
+    private String[] getArguments() {
+        return ArgumentRequirements.getInstance().getArguments();
     }
 
 }

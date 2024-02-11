@@ -3,11 +3,13 @@ package data;
 public class ArgumentRequirements {
     private static ArgumentRequirements instance;
 
-    private int width = -1;
-    private int height = -1;
-    private int generations = -1;
-    private int speed = -1;
-    private String population = "";
+    private int width = ArgumentErrorTypes.NO_PROVIDED;
+    private int height = ArgumentErrorTypes.NO_PROVIDED;
+    private int generations = ArgumentErrorTypes.NO_PROVIDED;
+    private int speed = ArgumentErrorTypes.NO_PROVIDED;
+    private String population = String.valueOf(ArgumentErrorTypes.NO_PROVIDED);
+
+    private String[] arguments = {};
 
     private ArgumentRequirements() {}
 
@@ -57,5 +59,13 @@ public class ArgumentRequirements {
 
     public void setPopulation(String population) {
         this.population = population;
+    }
+
+    public String[] getArguments() {
+        return arguments;
+    }
+
+    public void setArguments(String[] arguments) {
+        this.arguments = arguments;
     }
 }
