@@ -5,8 +5,8 @@ import parser.Parser;
 
 public class Main {
     public static void main(String[] args) {
-        int[] validWidths = new int[] {2, 3, 10, 20, 40, 80};
-        int[] validHeights = new int[] {2, 3, 10, 20, 40};
+        int[] validWidths = new int[] {10, 20, 40, 80};
+        int[] validHeights = new int[] {10, 20, 40};
 
         Configuration.withValidWidths(validWidths);
         Configuration.withValidHeights(validHeights);

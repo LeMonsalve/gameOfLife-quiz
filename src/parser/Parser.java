@@ -35,6 +35,8 @@ public class Parser {
     private int parseWidth() {
         int width = parseIntArg("w");
 
+        if (width == ArgumentErrorTypes.NO_PROVIDED) return width;
+
         int[] validWidths = ArgumentValidations.getInstance().getValidWidths();
 
         boolean isValid = isValidInt(width, validWidths);
@@ -46,6 +48,8 @@ public class Parser {
 
     private int parseHeight() {
         int height = parseIntArg("h");
+
+        if (height == ArgumentErrorTypes.NO_PROVIDED) return height;
 
         int[] validHeights = ArgumentValidations.getInstance().getValidHeights();
         boolean isValid = isValidInt(height, validHeights);
@@ -70,8 +74,14 @@ public class Parser {
         int height = ArgumentRequirements.getInstance().getHeight();
 
         String population = findArgByLetter("p");
+        String populationValue;
 
-        String populationValue = population.split("=")[1];
+        try {
+            populationValue = population.split("=")[1];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            population = String.valueOf(ArgumentErrorTypes.NO_PROVIDED);
+            return population;
+        }
 
         if (width == -1 || width == -2) {
             logger.error("Population is invalid because width is invalid or not present");
@@ -122,20 +132,30 @@ public class Parser {
             }
         }
 
+        if (value.isEmpty()) {
+            value = String.valueOf(ArgumentErrorTypes.NO_PROVIDED);
+        }
+
         return value;
     }
 
     private int parseIntArg(String argumentLetter) {
         String argValue = findArgByLetter(argumentLetter);
 
-        int number = ArgumentErrorTypes.NO_VALID;
+        int number = ArgumentErrorTypes.NO_PROVIDED;
+
+        if (argValue.equals(String.valueOf(ArgumentErrorTypes.NO_PROVIDED))) {
+            return number;
+        }
 
         if (!argValue.isEmpty()) {
             String value = argValue.split("=")[1];
 
             try {
                 number = Integer.parseInt(value);
-            } catch (NumberFormatException ignored) {}
+            } catch (NumberFormatException e) {
+                number = ArgumentErrorTypes.NO_VALID;
+            }
         }
 
         return number;
