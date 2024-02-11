@@ -103,7 +103,7 @@ public class Parser {
         int populationRows = populationValue.split("#").length;
         int populationCols = populationValue.split("#")[0].length();
 
-        if (populationRows != height || populationCols != width) {
+        if (populationRows > height || populationCols > width) {
             population = String.valueOf(ArgumentErrorTypes.NO_VALID);
             return population;
         }

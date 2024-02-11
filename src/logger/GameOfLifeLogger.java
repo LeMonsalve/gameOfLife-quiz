@@ -1,6 +1,7 @@
 package logger;
 
 import data.ArgumentRequirements;
+import helpers.Helpers;
 
 public class GameOfLifeLogger implements Logger {
     @Override
@@ -21,11 +22,17 @@ public class GameOfLifeLogger implements Logger {
         int speed = ArgumentRequirements.getInstance().getSpeed();
         String population = ArgumentRequirements.getInstance().getPopulation();
 
-        log("width = [" + (width == -1 ? "No present" : width == -2 ? "Invalid" : width) + "]");
-        log("height = [" + (height == -1 ? "No present" : height == -2 ? "Invalid" : height) + "]");
-        log("generations = [" + (generations == -1 ? "No present" : generations == -2 ? "Invalid" : generations) + "]");
-        log("speed = [" + (speed == -1 ? "No present" : speed == -2 ? "Invalid" : speed) + "]");
-        log("population = [" + (population.equals("-1") ? "No present" : population.equals("-2") ? "Invalid" : population) + "]");
+        String widthFormatted = Helpers.formatArgument("width", width);
+        String heightFormatted = Helpers.formatArgument("height", height);
+        String generationsFormatted = Helpers.formatArgument("generations", generations);
+        String speedFormatted = Helpers.formatArgument("speed", speed);
+        String populationFormatted = Helpers.formatArgument("population", population);
+
+        log(widthFormatted);
+        log(heightFormatted);
+        log(generationsFormatted);
+        log(speedFormatted);
+        log(populationFormatted);
     }
 
     @Override
